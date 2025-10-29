@@ -1,4 +1,3 @@
-import json
 import requests
 
 url = "https://randomuser.me/api/?results=5000"
