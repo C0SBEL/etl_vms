@@ -1,6 +1,6 @@
 import requests
 
-url = "https://randomuser.me/api/?results=5000"
+url = "https://randomuser.me/api/?results=9000"
 
 def getRandomUsers():
     try:
