@@ -5,18 +5,18 @@ from userTransformer import UserTransformer
 class ETLController:
     def __init__(self, extractor, transformer):
         self.extractor = extractor
-        self.transformer_class = transformer
+        self.transformer = transformer
 
     def run(self):
         data = self.extractor.get_users()
-        transformer = self.transformer_class(data)
-        transformed_data = transformer.transform()
-        return transformed_data
-
+        self.transformer.data = data.get("results", [])
+        return self.transformer.transform()
 
 if __name__ == "__main__":
-    extractor = UserExtractor("https://randomuser.me/api/", num_users=1000)
-    controller = ETLController(extractor, UserTransformer)
+    extractor = UserExtractor("https://randomuser.me/api/", num_users=5000)
+    transformer = UserTransformer({})
+    controller = ETLController(extractor, transformer)
+
     results = controller.run()
 
     print("\n=== Estadísticas de los usuarios extraídos ===")
