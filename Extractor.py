@@ -1,6 +1,6 @@
 import requests
 
-class UserExtractor:
+class Extractor:
     def __init__(self, base_url, num_users):
         self.base_url = base_url
         self.num_users = num_users

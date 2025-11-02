@@ -1,5 +1,5 @@
-from userExtractor import UserExtractor
-from userTransformer import UserTransformer
+from Extractor import Extractor
+from Transformer import Transformer
 
 
 class ETLController:
@@ -13,8 +13,8 @@ class ETLController:
         return self.transformer.transform()
 
 if __name__ == "__main__":
-    extractor = UserExtractor("https://randomuser.me/api/", num_users=5000)
-    transformer = UserTransformer({})
+    extractor = Extractor("https://randomuser.me/api/", num_users=5000)
+    transformer = Transformer({})
     controller = ETLController(extractor, transformer)
 
     results = controller.run()

@@ -1,6 +1,6 @@
 import statistics
 
-class UserTransformer:
+class Transformer:
     def __init__(self, data):
         self.data = data.get("results", [])
 
