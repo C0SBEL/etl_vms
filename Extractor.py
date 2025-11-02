@@ -9,7 +9,7 @@ class Extractor:
         try:
             response = requests.get(self.base_url, params={"results": self.num_users})
             response.raise_for_status()
-            return response.json()
+            return response.json().get("results", [])
         except Exception as e:
             print(f"Error al obtener usuarios: {e}")
             return {}
