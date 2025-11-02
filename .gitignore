@@ -1,1 +1,79 @@
-./idea/
+# --- Archivos de Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- Entornos virtuales ---
+venv/
+.env/
+env/
+.venv/
+
+# --- Archivos de configuración y dependencias ---
+*.env
+*.ini
+*.cfg
+*.toml
+*.yaml
+*.yml
+
+# --- Compilados y builds ---
+build/
+dist/
+*.egg-info/
+.eggs/
+*.manifest
+*.spec
+
+# --- Jupyter Notebooks checkpoints ---
+.ipynb_checkpoints
+
+# --- Archivos temporales del sistema ---
+.DS_Store
+Thumbs.db
+
+# --- Archivos de logs ---
+*.log
+logs/
+log/
+
+# --- Archivos de caché ---
+.cache/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+
+# --- IDEs ---
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# --- Testing ---
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# --- Documentación generada ---
+docs/_build/
+site/
+
+# --- Datos temporales ---
+data/tmp/
+*.npy
+*.npz
+
+# --- Otros ---
+*.bak
+*.swp
+*.tmp
