@@ -25,3 +25,10 @@ if __name__ == "__main__":
     print("Distribución por género:")
     print(f"  Hombres: {results['gender_distribution']['male']:.2f}%")
     print(f"  Mujeres: {results['gender_distribution']['female']:.2f}%")
+    print("Top 5 usuarios con más antigüedad:")
+    if results['top_5_ancient']:
+        for i, user in enumerate(results['top_5_ancient']):
+            print(f"  {i + 1}. {user['nombre_completo']}")
+            print(f"     -> Antigüedad: {user['antiguedad_años']} años (Registro: {user['fecha_registro']})")
+    else:
+        print("No se encontraron suficientes usuarios para el Top 5.")
