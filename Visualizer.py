@@ -1,5 +1,8 @@
 import os
 import matplotlib.pyplot as plt
+import geopandas as gpd
+import geoplot as gplt
+import geoplot.crs as gcrs
 
 class Visualizer:
     def __init__(self, output_dir="visualizations", clean=True):
@@ -75,16 +78,47 @@ class Visualizer:
         plt.savefig(path)
         plt.close()
 
+    def plot_country_cartogram(self, country_dist):
+        if not country_dist:
+            print("⚠️ No hay datos de países para generar el cartograma.")
+            return
+
+        world = gpd.read_file("https://naturalearth.s3.amazonaws.com/110m_cultural/ne_110m_admin_0_countries.zip")
+        world["percentage"] = 0.0
+        for i, row in world.iterrows():
+            name = row["NAME"]
+            if name in country_dist:
+                world.at[i, "percentage"] = country_dist[name]
+
+        gplt.cartogram(
+            world,
+            scale="percentage",
+            projection=gcrs.Robinson(),
+            legend=True,
+            figsize=(15, 8),
+            )
+        plt.title("Cartograma: Distribución de usuarios por país (%)", fontsize=14)
+
+        path = os.path.join(self.output_dir, "country_cartogram.png")
+        plt.tight_layout()
+        plt.savefig(path)
+        plt.close()
+
     def generate_visualizations(self, users, stats):
-        if users:
-            self.users = users
-        else:
+        if not users:
             print("⚠️ No se proporcionaron usuarios para la visualización.")
             return
 
+        self.users = users
         self.stats = stats
 
         # Llamar a los métodos de visualización
-
         self.plot_gender_distribution()
         self.plot_time_registered_distribution()
+        country_dist = self.stats.get("country_distribution")
+        if country_dist:
+            self.plot_country_cartogram(country_dist)
+        else:
+            print("⚠️ No hay distribución de países en las estadísticas.")
+
+
