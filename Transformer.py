@@ -1,21 +1,25 @@
-import statistics
-
 class Transformer:
     def __init__(self):
         self.users = []
         self.statistics = {}
 
     def average_time_registered(self):
-        registered_ages = [
+        registered_times = [
             u["registered"]["age"]
             for u in self.users
             if "registered" in u and "age" in u["registered"]
         ]
-        if not registered_ages:
+
+        if not registered_times:
             return None
-        avg = statistics.mean(registered_ages)
+
+        total = sum(registered_times)
+        count = len(registered_times)
+        avg = total / count
         avg_rounded = round(avg, 2)
+
         self.statistics["average_time_registered"] = avg_rounded
+
         return avg_rounded
 
     def gender_distribution(self):
