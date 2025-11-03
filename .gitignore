@@ -15,8 +15,7 @@ venv/
 *.sqlite3
 
 # === Carpeta de visualizaciones ===
-visualizations/
-
+/data/*
 # === Archivos temporales ===
 *.tmp
 *.bak

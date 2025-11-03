@@ -1,7 +1,7 @@
-from Extractor import Extractor
-from Transformer import Transformer
-from Visualizer import Visualizer
-from Loader import Loader
+from etl.services.Extractor import Extractor
+from etl.services.Transformer import Transformer
+from etl.services.Visualizer import Visualizer
+from etl.services.Loader import Loader
 
 
 class ETLController:
@@ -35,13 +35,3 @@ class ETLController:
 
         print("✅ Proceso ETL completado.")
         return stats
-
-
-if __name__ == "__main__":
-    extractor = Extractor(base_url="https://randomuser.me/api/", num_users=5000)
-    transformer = Transformer()
-    visualizer = Visualizer("visualizations", clean=True)
-    loader = Loader(db_path="etl_results.db", reset=True)
-
-    controller = ETLController(extractor, transformer, visualizer, loader)
-    controller.run()
