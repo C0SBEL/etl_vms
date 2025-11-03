@@ -138,7 +138,7 @@ class Loader:
                 """,
                 (
                     stats["total_users"],
-                    stats["average_registered_age"],
+                    stats["average_time_registered"],
                     stats["gender_distribution"]["male"],
                     stats["gender_distribution"]["female"]
                 )

@@ -5,7 +5,7 @@ class Transformer:
         self.users = []
         self.statistics = {}
 
-    def average_registered_age(self):
+    def average_time_registered(self):
         registered_ages = [
             u["registered"]["age"]
             for u in self.users
@@ -14,8 +14,9 @@ class Transformer:
         if not registered_ages:
             return None
         avg = statistics.mean(registered_ages)
-        self.statistics["average_registered_age"] = avg
-        return avg
+        avg_rounded = round(avg, 2)
+        self.statistics["average_time_registered"] = avg_rounded
+        return avg_rounded
 
     def gender_distribution(self):
         genders = [u["gender"] for u in self.users if "gender" in u]
@@ -23,8 +24,8 @@ class Transformer:
         if total == 0:
             return {}
         dist = {
-            "male": genders.count("male") / total * 100,
-            "female": genders.count("female") / total * 100,
+            "male": round(genders.count("male") / total * 100, 2),  # Redondear
+            "female": round(genders.count("female") / total * 100, 2),  # Redondear
         }
         self.statistics["gender_distribution"] = dist
         return dist
@@ -38,7 +39,7 @@ class Transformer:
         self.users = users
 
         #Llamar a los métodos para calcular las estadísticas
-        self.average_registered_age()
+        self.average_time_registered()
         self.gender_distribution()
         self.total_users()
 

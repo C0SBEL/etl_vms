@@ -27,7 +27,7 @@ class ETLController:
             print(f" - {key}: {value}")
 
         print("📈 Generando visualizaciones...")
-        self.visualizer.generate_visualizations(stats)
+        self.visualizer.generate_visualizations(users, stats)
 
         print("💾 Cargando datos en la base de datos SQL...")
         self.loader.save_users(users)

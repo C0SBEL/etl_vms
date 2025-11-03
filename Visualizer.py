@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 
 class Visualizer:
     def __init__(self, output_dir="visualizations", clean=True):
+        self.users = []
+        self.stats = {}
         self.output_dir = output_dir
         os.makedirs(self.output_dir, exist_ok=True)
 
@@ -21,35 +23,66 @@ class Visualizer:
             except Exception as e:
                 print(f"⚠️ No se pudo eliminar {file_path}: {e}")
 
-    def plot_gender_distribution(self, gender_distribution):
-        if not gender_distribution:
-            print("⚠️ No hay datos de género para graficar.")
+    def plot_gender_distribution(self):
+        genders = [u.get("gender") for u in self.users if "gender" in u]
+        total = len(genders)
+        if total == 0:
+            print("⚠️ No hay datos de género.")
             return
 
-        plt.bar(gender_distribution.keys(), gender_distribution.values(), color=["skyblue", "lightpink"])
+        gender_dist = self.stats.get("gender_distribution")
+        if not gender_dist:
+            print("⚠️ No hay estadísticas de género en stats.")
+            return
+
+        plt.figure(figsize=(8, 6))
+        bars = plt.bar(gender_dist.keys(), gender_dist.values(), color=["skyblue", "darksalmon"])
         plt.ylabel("Porcentaje (%)")
         plt.title("Distribución de género")
+
+        for bar, value in zip(bars, gender_dist.values()):
+            plt.text(bar.get_x() + bar.get_width() / 2, value + 0.5, f"{value}%", ha="center", va="bottom")
+
         plt.tight_layout()
         path = os.path.join(self.output_dir, "gender_distribution.png")
         plt.savefig(path)
         plt.close()
-        print(f"📊 Gráfico guardado en: {path}")
 
-    def plot_registered_age(self, avg_age):
-        if avg_age is None:
-            print("⚠️ No hay edad promedio para graficar.")
+    def plot_time_registered_distribution(self):
+        times = [u["registered"]["age"] for u in self.users if "registered" in u and "age" in u["registered"]]
+        if not times:
+            print("⚠️ No hay datos de tiempo registrado.")
             return
 
-        plt.figure(figsize=(4, 4))
-        plt.bar(["Edad promedio"], [avg_age], color="orange")
-        plt.ylabel("Edad (años)")
-        plt.title("Edad promedio de registro")
+        avg_time = self.stats.get("average_time_registered")
+        if avg_time is None:
+            print("⚠️ No hay estadística de tiempo registrado promedio.")
+
+        # Crear histograma
+        plt.figure(figsize=(8, 5))
+        plt.hist(times, bins=10, color="skyblue", edgecolor="black")
+        plt.xlabel("Años registrados")
+        plt.ylabel("Número de usuarios")
+        plt.title("Distribución del tiempo que los usuarios llevan registrados")
+
+        # Línea de referencia de la media
+        plt.axvline(avg_time, color="red", linestyle="dashed", linewidth=2)
+        plt.text(avg_time + 0.1, plt.ylim()[1] * 0.9, f"Media = {avg_time} años", color="red")
+
+        # Guardar gráfico
+        path = os.path.join(self.output_dir, "registered_time_distribution.png")
         plt.tight_layout()
-        path = os.path.join(self.output_dir, "average_age.png")
         plt.savefig(path)
         plt.close()
-        print(f"📈 Gráfico guardado en: {path}")
 
-    def generate_visualizations(self, stats):
-        self.plot_gender_distribution(stats.get("gender_distribution"))
-        self.plot_registered_age(stats.get("average_registered_age"))
+    def generate_visualizations(self, users, stats=None):
+        if users:
+            self.users = users
+        else:
+            print("⚠️ No se proporcionaron usuarios para la visualización.")
+            return
+        if stats:
+            self.stats = stats
+
+        self.plot_gender_distribution()
+        self.plot_time_registered_distribution()
