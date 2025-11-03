@@ -87,10 +87,11 @@ class Transformer:
             else:
                 groups["70+"] += 1
 
-        total = len(ages)
+
         for g in groups:
             groups[g] = round(groups[g])
 
+        self.statistics["age_groups_distribution"] = groups
         return groups
 
     def transform(self, users):
