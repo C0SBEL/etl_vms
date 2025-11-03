@@ -1,5 +1,6 @@
 import os
 import matplotlib.pyplot as plt
+import simplekml
 
 class Visualizer:
     def __init__(self, output_dir="visualizations", clean=True):
@@ -75,6 +76,31 @@ class Visualizer:
         plt.savefig(path)
         plt.close()
 
+    def plot_user_locations(self):
+        kml = simplekml.Kml()
+
+        for u in self.users:
+            try:
+                location = u["location"]
+                coords = location["coordinates"]
+                lat = coords["latitude"]
+                lon = coords["longitude"]
+
+                name = f"{u['name']['first']} {u['name']['last']}"
+                kml.newpoint(name=name, coords=[(lon, lat)])
+
+            except KeyError:
+                continue
+
+        path = os.path.join(self.output_dir, "user_locations.kml")
+        kml.save(path)
+        print(f"✅ KML created: {path}")
+
+
+
+
+
+
     def generate_visualizations(self, users, stats):
         if users:
             self.users = users
@@ -88,3 +114,5 @@ class Visualizer:
 
         self.plot_gender_distribution()
         self.plot_time_registered_distribution()
+        self.plot_user_locations()
+        self.plot_user_locations()

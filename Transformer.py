@@ -72,7 +72,7 @@ class Transformer:
         return age_dist
 
     def age_groups_distribution(self):
-        ages = [user["dob"]["age"] for user in self.data if "dob" in user and "age" in user["dob"]]
+        ages = [user["dob"]["age"] for user in self.users if "dob" in user and "age" in user["dob"]]
         if not ages:
             return None
 
@@ -94,6 +94,28 @@ class Transformer:
         self.statistics["age_groups_distribution"] = groups
         return groups
 
+    def latest_user(self):
+        valid_users = [user for user in self.users if 'registered' in user]
+        ordered_users = sorted(valid_users, key=lambda user: user['registered']['age'],
+                               reverse=False)
+        top_users = ordered_users[1]
+
+
+        if top_users:
+            name = f"{top_users['name']['first']} {top_users['name']['last']}"
+            country = top_users['location']['country']
+            latest_date = top_users['registered']['date']
+            print("📅 Last registered user:")
+            print(f"   Name: {name}")
+            print(f"   Country: {country}")
+            print(f"   Date: {latest_date}")
+
+        self.statistics["latest_user"] = top_users
+
+
+
+
+
     def transform(self, users):
         self.users = users
 
@@ -102,6 +124,8 @@ class Transformer:
         self.gender_distribution()
         self.total_users()
         self.age_distribution()
+        self.age_groups_distribution()
+        self.latest_user()
 
         #Devuelve el diccionario de estadísticas
         return self.statistics
