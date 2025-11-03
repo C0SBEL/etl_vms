@@ -134,7 +134,6 @@ def avg_by_country(self, top_n: int=10):
     plt.xlabel("País")
     plt.xticks(rotation=45, ha="right")
 
-    # Anotar valors sobre les barres
     for bar, val in zip(bars, values):
         plt.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.3, f"{val}", ha="center", va="bottom")
 
@@ -161,3 +160,4 @@ def avg_by_country(self, top_n: int=10):
         self.plot_time_registered_distribution()
         self.plot_user_locations()
         self.plot_user_locations()
+        self.avg_by_country()
