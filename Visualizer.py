@@ -75,14 +75,16 @@ class Visualizer:
         plt.savefig(path)
         plt.close()
 
-    def generate_visualizations(self, users, stats=None):
+    def generate_visualizations(self, users, stats):
         if users:
             self.users = users
         else:
             print("⚠️ No se proporcionaron usuarios para la visualización.")
             return
-        if stats:
-            self.stats = stats
+
+        self.stats = stats
+
+        # Llamar a los métodos de visualización
 
         self.plot_gender_distribution()
         self.plot_time_registered_distribution()
