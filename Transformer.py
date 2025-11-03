@@ -30,6 +30,8 @@ class Transformer:
             "male": round(genders.count("male") / total * 100, 2),  # Redondear
             "female": round(genders.count("female") / total * 100, 2),  # Redondear
         }
+        self.statistics["gender_distribution"] = dist
+        return dist
 
     def top_5_ancient (self, top_n: int = 5 ):
         valid_users = [user for user in self.data if 'registered' in user]
@@ -44,6 +46,7 @@ class Transformer:
                 'antiguedad_años': user['registered']['age'],
                 'fecha_registro': user['registered']['date']
             })
+        self.statistics["top_5_ancient"] = formatted_top_users
         return formatted_top_users
         
     def total_users(self):
