@@ -1,3 +1,6 @@
+import statistics
+
+
 class Transformer:
     def __init__(self):
         self.users = []
@@ -34,7 +37,7 @@ class Transformer:
         return dist
 
     def top_5_ancient (self, top_n: int = 5 ):
-        valid_users = [user for user in self.data if 'registered' in user]
+        valid_users = [user for user in self.users if 'registered' in user]
         ordered_users = sorted( valid_users, key=lambda user: user['registered']['age'],
             reverse=True)
         top_users = ordered_users[:top_n]
@@ -54,6 +57,42 @@ class Transformer:
         self.statistics["total_users"] = total
         return total
 
+
+    def age_distribution(self):
+        age_distribution = [user["dob"]["age"] for user in self.users if "dob" in user]
+        if not age_distribution:
+                return None
+        age_dist = {
+            "average": statistics.mean(age_distribution),
+            "stdev": statistics.stdev(age_distribution),
+            "max": max(age_distribution),
+            "min": min(age_distribution)
+        }
+        self.statistics["age_distribution"] = age_dist
+        return age_dist
+
+    def age_groups_distribution(self):
+        ages = [user["dob"]["age"] for user in self.data if "dob" in user and "age" in user["dob"]]
+        if not ages:
+            return None
+
+        groups = {"18-29": 0, "30-49": 0, "50-69": 0, "70+": 0}
+        for age in ages:
+            if age < 30:
+                groups["18-29"] += 1
+            elif age < 45:
+                groups["30-49"] += 1
+            elif age < 60:
+                groups["50-69"] += 1
+            else:
+                groups["70+"] += 1
+
+        total = len(ages)
+        for g in groups:
+            groups[g] = round(groups[g])
+
+        return groups
+
     def transform(self, users):
         self.users = users
 
@@ -61,6 +100,7 @@ class Transformer:
         self.average_time_registered()
         self.gender_distribution()
         self.total_users()
+        self.age_distribution()
 
         #Devuelve el diccionario de estadísticas
         return self.statistics
