@@ -1,24 +1,36 @@
-import statistics
-
 class Transformer:
-    def __init__(self, data):
-        self.data = data.get("results", [])
+    def __init__(self):
+        self.users = []
+        self.statistics = {}
 
-    def average_registered_age(self):
-        registered_ages = [user["registered"]["age"] for user in self.data if "registered" in user]
-        if not registered_ages:
+    def average_time_registered(self):
+        registered_times = [
+            u["registered"]["age"]
+            for u in self.users
+            if "registered" in u and "age" in u["registered"]
+        ]
+
+        if not registered_times:
             return None
-        return statistics.mean(registered_ages)
+
+        total = sum(registered_times)
+        count = len(registered_times)
+        avg = total / count
+        avg_rounded = round(avg, 2)
+
+        self.statistics["average_time_registered"] = avg_rounded
+        return avg_rounded
 
     def gender_distribution(self):
-        genders = [user["gender"] for user in self.data if "gender" in user]
+        genders = [u["gender"] for u in self.users if "gender" in u]
         total = len(genders)
         if total == 0:
             return {}
-        return {
-            "male": genders.count("male") / total * 100,
-            "female": genders.count("female") / total * 100
+        dist = {
+            "male": round(genders.count("male") / total * 100, 2),  # Redondear
+            "female": round(genders.count("female") / total * 100, 2),  # Redondear
         }
+
     def top_5_ancient (self, top_n: int = 5 ):
         valid_users = [user for user in self.data if 'registered' in user]
         ordered_users = sorted( valid_users, key=lambda user: user['registered']['age'],
@@ -33,11 +45,19 @@ class Transformer:
                 'fecha_registro': user['registered']['date']
             })
         return formatted_top_users
+        
+    def total_users(self):
+        total = len(self.users)
+        self.statistics["total_users"] = total
+        return total
 
-    def transform(self):
-        return {
-            "average_registered_age": self.average_registered_age(),
-            "gender_distribution": self.gender_distribution(),
-            "total_users": len(self.data),
-            "top_5_ancient": self.top_5_ancient(top_n=5)
-        }
+    def transform(self, users):
+        self.users = users
+
+        #Llamar a los métodos para calcular las estadísticas
+        self.average_time_registered()
+        self.gender_distribution()
+        self.total_users()
+
+        #Devuelve el diccionario de estadísticas
+        return self.statistics

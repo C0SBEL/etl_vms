@@ -1,79 +1,29 @@
-# --- Archivos de Python ---
+# === Python ===
 __pycache__/
-*.py[cod]
-*$py.class
-
-# --- Entornos virtuales ---
-venv/
-.env/
-env/
-.venv/
-
-# --- Archivos de configuración y dependencias ---
-*.env
-*.ini
-*.cfg
-*.toml
-*.yaml
-*.yml
-
-# --- Compilados y builds ---
-build/
-dist/
-*.egg-info/
-.eggs/
-*.manifest
-*.spec
-
-# --- Jupyter Notebooks checkpoints ---
-.ipynb_checkpoints
-
-# --- Archivos temporales del sistema ---
-.DS_Store
-Thumbs.db
-
-# --- Archivos de logs ---
-*.log
-logs/
-log/
-
-# --- Archivos de caché ---
-.cache/
 *.pyc
 *.pyo
 *.pyd
+*.log
+
+# === Entorno virtual ===
+.venv/
+env/
+venv/
+
+# === Archivos de base de datos ===
+*.db
 *.sqlite3
 
-# --- IDEs ---
-.vscode/
-.idea/
-*.sublime-project
-*.sublime-workspace
+# === Carpeta de visualizaciones ===
+visualizations/
 
-# --- Testing ---
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
-
-# --- Documentación generada ---
-docs/_build/
-site/
-
-# --- Datos temporales ---
-data/tmp/
-*.npy
-*.npz
-
-# --- Otros ---
-*.bak
-*.swp
+# === Archivos temporales ===
 *.tmp
+*.bak
+
+# === Archivos de IDE ===
+.idea/
+.vscode/
+
+# === Otros ===
+.DS_Store
