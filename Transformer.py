@@ -19,7 +19,6 @@ class Transformer:
         avg_rounded = round(avg, 2)
 
         self.statistics["average_time_registered"] = avg_rounded
-
         return avg_rounded
 
     def gender_distribution(self):
@@ -47,4 +46,5 @@ class Transformer:
         self.gender_distribution()
         self.total_users()
 
+        #Devuelve el diccionario de estadísticas
         return self.statistics
