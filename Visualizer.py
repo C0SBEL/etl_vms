@@ -1,6 +1,7 @@
 import os
 import matplotlib.pyplot as plt
 import simplekml
+import statistics
 
 class Visualizer:
     def __init__(self, output_dir="visualizations", clean=True):
@@ -97,7 +98,51 @@ class Visualizer:
         print(f"✅ KML created: {path}")
 
 
+def avg_by_country(self, top_n: int=10):
+    valid_users = [u for u in self.users if "location" in u and "country" in u["location"] and "dob" in u and "age" in u["dob"]]
 
+    country_ages = {}
+
+    for u in valid_users:
+        country = u["location"]["country"]
+        age = u["dob"]["age"]
+        country_ages.setdefault(country, []).append(age)
+
+    avg_by_country = {country: round(statistics.mean(ages), 1) for country, ages in country_ages.items() if ages}
+
+    ordered_countries = sorted(
+        avg_by_country.items(),
+        key=lambda item: item[1],
+        reverse=True
+    )
+
+    top_countries = ordered_countries[:top_n]
+
+    data = self.avg_by_country(top_n=top_n)
+    if not data:
+        print("⚠️ No hi ha dades per països.")
+        return
+
+    countries = [d["country"] for d in data]
+    values = [d["avg_age"] for d in data]
+
+    plt.figure(figsize=(10, 6))
+    bars = plt.bar(countries, values, color="steelblue")
+
+    plt.title(f"Mitjana d’edat per país (Top {top_n})")
+    plt.ylabel("Edat mitjana")
+    plt.xlabel("País")
+    plt.xticks(rotation=45, ha="right")
+
+    # Anotar valors sobre les barres
+    for bar, val in zip(bars, values):
+        plt.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.3, f"{val}", ha="center", va="bottom")
+
+    plt.tight_layout()
+    path = os.path.join(self.output_dir, "avg_age_by_country.png")
+    plt.savefig(path)
+    plt.close()
+    print(f"✅ Gràfic guardat: {path}")
 
 
 
