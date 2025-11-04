@@ -151,21 +151,81 @@ class Transformer:
     
     def registration_seasonality(self):
         months = []
+        genders = []
+        
         for user in self.users:
-            if "registered" in user and "date" in user["registered"]:
+            if "registered" in user and "date" in user["registered"] and "gender" in user:
                 try:
-                    months.append(datetime.fromisoformat(user["registered"]["date"].replace('Z', '+00:00')).month)
+                    month = datetime.fromisoformat(user["registered"]["date"].replace('Z', '+00:00')).month
+                    months.append(month)
+                    genders.append(user["gender"])
                 except:
                     pass
         
         if not months:
             return None
         
-        month_counts = Counter(months) # Contar registros por mes
-        monthly_registrations = {month: month_counts.get(month, 0) for month in range(1, 13)} # Diccionario ordenado (1-12)
+        # Contar registros totales por mes
+        month_counts = Counter(months)
+        monthly_registrations = {month: month_counts.get(month, 0) for month in range(1, 13)}
         
-        self.statistics["registration_seasonality"] = monthly_registrations
-        return monthly_registrations
+        # Contar registros por mes y género
+        monthly_by_gender = {
+            "male": {month: 0 for month in range(1, 13)},
+            "female": {month: 0 for month in range(1, 13)}
+        }
+        
+        for month, gender in zip(months, genders):
+            if gender in ["male", "female"]:
+                monthly_by_gender[gender][month] += 1
+        
+        self.statistics["registration_seasonality"] = {
+            "total": monthly_registrations,
+            "by_gender": monthly_by_gender
+        }
+        
+        return self.statistics["registration_seasonality"]
+    
+    def user_retention_analysis(self):
+        """Analiza qué usuarios podrían considerarse 'activos' basado en antigüedad"""
+        if not self.users:
+            return None
+        
+        registered_ages = [user["registered"]["age"] for user in self.users 
+                        if "registered" in user and "age" in user["registered"]]
+        
+        if not registered_ages:
+            return None
+        
+        # Categorizar usuarios
+        new_users = [age for age in registered_ages if age < 2]
+        established = [age for age in registered_ages if 2 <= age < 5]
+        veterans = [age for age in registered_ages if 5 <= age < 10]
+        legends = [age for age in registered_ages if age >= 10]
+        
+        total = len(registered_ages)
+        
+        retention = {
+            "new_users_0-2y": {
+                "count": len(new_users),
+                "percentage": round(len(new_users) / total * 100, 2)
+            },
+            "established_2-5y": {
+                "count": len(established),
+                "percentage": round(len(established) / total * 100, 2)
+            },
+            "veterans_5-10y": {
+                "count": len(veterans),
+                "percentage": round(len(veterans) / total * 100, 2)
+            },
+            "legends_10y+": {
+                "count": len(legends),
+                "percentage": round(len(legends) / total * 100, 2)
+            }
+        }
+        
+        self.statistics["user_retention_analysis"] = retention
+        return retention
         
     def transform(self, users):
         self.users = users
@@ -178,6 +238,7 @@ class Transformer:
         self.age_registered_correlation()
         self.registration_timeline()
         self.registration_seasonality()
+        self.user_retention_analysis()
 
         #Devuelve el diccionario de estadísticas
         return self.statistics
