@@ -247,6 +247,27 @@ class Transformer:
         self.statistics["most_common_names"] = names_stats
         return names_stats
 
+    def typical_user_profile(self):
+        """Crea un perfil del usuario más común"""
+        if not self.users:
+            return None
+        
+        genders = [u["gender"] for u in self.users if "gender" in u]
+        countries = [u["location"]["country"] for u in self.users 
+                    if "location" in u and "country" in u["location"]]
+        ages = [u["dob"]["age"] for u in self.users if "dob" in u]
+        
+        profile = {
+            "most_common_gender": Counter(genders).most_common(1)[0][0] if genders else None,
+            "most_common_country": Counter(countries).most_common(1)[0][0] if countries else None,
+            "median_age": round(statistics.median(ages), 0) if ages else None,
+            "average_age": round(statistics.mean(ages), 1) if ages else None,
+            "total_users": len(self.users)
+        }
+        
+        self.statistics["typical_user_profile"] = profile
+        return profile    
+
         
     def transform(self, users):
         self.users = users
@@ -261,6 +282,7 @@ class Transformer:
         self.registration_seasonality()
         self.user_retention_analysis()
         self.most_common_names()
+        self.typical_user_profile()
 
         #Devuelve el diccionario de estadísticas
         return self.statistics

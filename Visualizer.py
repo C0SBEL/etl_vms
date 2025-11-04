@@ -359,6 +359,107 @@ class Visualizer:
         path = os.path.join(self.output_dir, "most_common_names.png")
         plt.savefig(path, dpi=300, bbox_inches='tight')
         plt.close()
+
+    def plot_typical_user_profile(self):
+        """Crea una visualización del perfil de usuario típico"""
+        profile = self.stats.get("typical_user_profile")
+        if not profile:
+            return
+        
+        # Crear figura con diseño moderno
+        fig, ax = plt.subplots(figsize=(10, 8), facecolor='white')
+        ax.axis('off')
+        
+        # Título principal
+        title = ax.text(0.5, 0.95, '👤 Perfil del Usuario Típico', 
+                        ha='center', va='top', fontsize=24, fontweight='bold', 
+                        color='#2C3E50', transform=ax.transAxes)
+        
+        # Subtítulo
+        subtitle = ax.text(0.5, 0.88, f'Basado en {profile.get("total_users", 0):,} usuarios', 
+                        ha='center', va='top', fontsize=12, 
+                        color='#7F8C8D', style='italic', transform=ax.transAxes)
+        
+        # Crear tarjetas de información
+        cards = [
+            {
+                'icon': '👥',
+                'label': 'Género más común',
+                'value': profile.get('most_common_gender', 'N/A').capitalize(),
+                'color': '#3498DB'
+            },
+            {
+                'icon': '🌍',
+                'label': 'País más común',
+                'value': profile.get('most_common_country', 'N/A'),
+                'color': '#2ECC71'
+            },
+            {
+                'icon': '📊',
+                'label': 'Edad promedio',
+                'value': f"{profile.get('average_age', 0)} años",
+                'color': '#E74C3C'
+            },
+            {
+                'icon': '🎯',
+                'label': 'Edad mediana',
+                'value': f"{int(profile.get('median_age', 0))} años",
+                'color': '#F39C12'
+            }
+        ]
+        
+        # Posiciones para las tarjetas (2x2 grid)
+        positions = [
+            (0.25, 0.65),  # Top left
+            (0.75, 0.65),  # Top right
+            (0.25, 0.35),  # Bottom left
+            (0.75, 0.35)   # Bottom right
+        ]
+        
+        # Dibujar las tarjetas
+        for card, (x, y) in zip(cards, positions):
+            # Rectángulo de fondo
+            from matplotlib.patches import FancyBboxPatch
+            rect = FancyBboxPatch(
+                (x - 0.18, y - 0.12), 0.36, 0.20,
+                boxstyle="round,pad=0.01",
+                transform=ax.transAxes,
+                facecolor='white',
+                edgecolor=card['color'],
+                linewidth=3,
+                alpha=0.9
+            )
+            ax.add_patch(rect)
+            
+            # Icono
+            ax.text(x, y + 0.06, card['icon'], 
+                    ha='center', va='center', fontsize=32, 
+                    transform=ax.transAxes)
+            
+            # Label
+            ax.text(x, y - 0.02, card['label'], 
+                    ha='center', va='center', fontsize=10, 
+                    color='#7F8C8D', transform=ax.transAxes)
+            
+            # Value
+            ax.text(x, y - 0.08, card['value'], 
+                    ha='center', va='center', fontsize=14, 
+                    fontweight='bold', color=card['color'], 
+                    transform=ax.transAxes)
+        
+        # Pie de página
+        footer = ax.text(0.5, 0.05, 
+                        '📈 Análisis ETL - Random User Data', 
+                        ha='center', va='center', fontsize=10, 
+                        color='#95A5A6', style='italic', 
+                        transform=ax.transAxes)
+        
+        plt.tight_layout()
+        
+        # Guardar
+        path = os.path.join(self.output_dir, "typical_user_profile.png")
+        plt.savefig(path, dpi=300, bbox_inches='tight', facecolor='white')
+        plt.close()
  
     def generate_visualizations(self, users, stats):
         if users:
@@ -376,3 +477,4 @@ class Visualizer:
         self.plot_registration_seasonality()
         self.plot_user_retention_analysis() 
         self.plot_most_common_names()
+        self.plot_typical_user_profile()
