@@ -78,31 +78,32 @@ class Visualizer:
         plt.savefig(path)
         plt.close()
 
-    def plot_country_cartogram(self, country_dist):
+    def plot_country_choropleth(self, country_dist):
         if not country_dist:
-            print("⚠️ No hay datos de países para generar el cartograma.")
+            print("No hay datos de países para generar el mapa.")
             return
-
         world = gpd.read_file("https://naturalearth.s3.amazonaws.com/110m_cultural/ne_110m_admin_0_countries.zip")
-        world["percentage"] = 0.0
-        for i, row in world.iterrows():
-            name = row["NAME"]
-            if name in country_dist:
-                world.at[i, "percentage"] = country_dist[name]
+        world["percentage"] = world["NAME"].map(country_dist).fillna(0)
+        fig, ax = plt.subplots(subplot_kw={'projection': gcrs.Robinson()}, figsize=(15, 8))
 
-        gplt.cartogram(
+        gplt.choropleth(
             world,
-            scale="percentage",
-            projection=gcrs.Robinson(),
+            hue="percentage",
+            cmap="Blues",  # Escala de color
             legend=True,
-            figsize=(15, 8),
-            )
-        plt.title("Cartograma: Distribución de usuarios por país (%)", fontsize=14)
+            edgecolor="black",
+            linewidth=0.4,
+            projection=gcrs.Robinson(),
+            ax=ax
+        )
 
-        path = os.path.join(self.output_dir, "country_cartogram.png")
+        plt.title("Mapa mundial: Distribución de usuarios por país (%)", fontsize=14, weight="bold", pad=20)
+
+        path = os.path.join(self.output_dir, "country_choropleth.png")
         plt.tight_layout()
-        plt.savefig(path)
+        plt.savefig(path, dpi=300)
         plt.close()
+        print(f"Mapa guardado en: {path}")
 
     def generate_visualizations(self, users, stats):
         if not users:
@@ -115,9 +116,10 @@ class Visualizer:
         # Llamar a los métodos de visualización
         self.plot_gender_distribution()
         self.plot_time_registered_distribution()
+
         country_dist = self.stats.get("country_distribution")
         if country_dist:
-            self.plot_country_cartogram(country_dist)
+            self.plot_country_choropleth(country_dist)
         else:
             print("⚠️ No hay distribución de países en las estadísticas.")
 
