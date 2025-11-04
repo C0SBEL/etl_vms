@@ -1,4 +1,5 @@
 import statistics
+from itertools import count
 
 
 class Transformer:
@@ -56,6 +57,26 @@ class Transformer:
         total = len(self.users)
         self.statistics["total_users"] = total
         return total
+
+    def ask_name(self):
+        try:
+            name = input("Whats' your name?").strip()
+        except EOFError:
+            name = ""
+        target = name.lower()
+        count = 0
+
+        for u in self.users:
+            try:
+                if u["name"]["first"] == target:
+                    count += 1
+            except Exception:
+                continue
+
+            self.statistics["ask_name"] = count
+
+        return count
+
 
 
     def age_distribution(self):
@@ -126,6 +147,7 @@ class Transformer:
         self.age_distribution()
         self.age_groups_distribution()
         self.latest_user()
+        self.ask_name()
 
         #Devuelve el diccionario de estadísticas
         return self.statistics

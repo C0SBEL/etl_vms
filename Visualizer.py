@@ -2,6 +2,7 @@ import os
 import matplotlib.pyplot as plt
 import simplekml
 import statistics
+from datetime import datetime
 
 class Visualizer:
     def __init__(self, output_dir="visualizations", clean=True):
@@ -98,10 +99,7 @@ class Visualizer:
         print(f"✅ KML created: {path}")
 
     def avg_by_country(self, top_n: int = 10):
-        valid_users = [
-            u for u in self.users
-            if "location" in u and "country" in u["location"] and "dob" in u and "age" in u["dob"]
-        ]
+        valid_users = [u for u in self.users if "location" in u and "country" in u["location"] and "dob" in u and "age" in u["dob"]]
 
         country_ages = {}
         for u in valid_users:
@@ -113,21 +111,15 @@ class Visualizer:
                 continue
             country_ages.setdefault(country, []).append(age_val)
 
-        avg_by_country = {
-            country: round(statistics.mean(ages), 1)
-            for country, ages in country_ages.items() if ages
-        }
+        avg_by_country = {country: round(statistics.mean(ages), 1) for country, ages in country_ages.items() if ages}
 
-        ordered_countries = sorted(
-            avg_by_country.items(),
-            key=lambda item: item[1],
-            reverse=True
-        )
+        ordered_countries = sorted(avg_by_country.items(), key=lambda item: item[1], reverse=True)
+
         top_countries = ordered_countries[:top_n]
 
         # Fix: comprovar llista real obtinguda
         if not top_countries:
-            print("⚠️ No data.")
+            print("No data.")
             return
 
         countries = [c for c, _ in top_countries]
@@ -148,8 +140,37 @@ class Visualizer:
         path = os.path.join(self.output_dir, "avg_age_by_country.png")
         plt.savefig(path)
         plt.close()
-        print(f"✅ Save at: {path}")
+        print(f"Saved at: {path}")
 
+    def reg_timeline(self):
+        reg_years = []
+        ages = []
+        users = [u for u in self.users if "date" in u and "registered" in u["registered"] and "dob" in u and "age" in u["dob"]]
+
+        for u in users:
+            try:
+                reg = u["registered"]["date"]
+                age = u["dob"]["age"]
+                year = datetime.fromisoformat(reg.replace("Z", "+00:00")).year
+                reg_years.append(year)
+                ages.append(age)
+
+            except Exception:
+                continue
+
+        plt.figure(figsize=(9, 5))
+        plt.scatter(reg_years, ages, alpha=0.6, edgecolor='k', linewidth=0.5, color='teal')
+
+        plt.title("Edat actual vs Any de registre dels usuaris", fontsize=13)
+        plt.xlabel("Any de registre", fontsize=11)
+        plt.ylabel("Edat actual", fontsize=11)
+        plt.grid(alpha=0.3)
+
+        plt.tight_layout()
+        plt.show()
+        path = os.path.join(self.output_dir, "reg_timeline.png")
+        plt.savefig(path)
+        plt.close()
 
 
     def generate_visualizations(self, users, stats):
@@ -168,3 +189,4 @@ class Visualizer:
         self.plot_user_locations()
         self.plot_user_locations()
         self.avg_by_country()
+        self.reg_timeline()
