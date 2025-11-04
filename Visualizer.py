@@ -97,51 +97,58 @@ class Visualizer:
         kml.save(path)
         print(f"✅ KML created: {path}")
 
+    def avg_by_country(self, top_n: int = 10):
+        valid_users = [
+            u for u in self.users
+            if "location" in u and "country" in u["location"] and "dob" in u and "age" in u["dob"]
+        ]
 
-def avg_by_country(self, top_n: int=10):
-    valid_users = [u for u in self.users if "location" in u and "country" in u["location"] and "dob" in u and "age" in u["dob"]]
+        country_ages = {}
+        for u in valid_users:
+            country = u["location"]["country"]
+            age = u["dob"]["age"]
+            try:
+                age_val = float(age)
+            except (TypeError, ValueError):
+                continue
+            country_ages.setdefault(country, []).append(age_val)
 
-    country_ages = {}
+        avg_by_country = {
+            country: round(statistics.mean(ages), 1)
+            for country, ages in country_ages.items() if ages
+        }
 
-    for u in valid_users:
-        country = u["location"]["country"]
-        age = u["dob"]["age"]
-        country_ages.setdefault(country, []).append(age)
+        ordered_countries = sorted(
+            avg_by_country.items(),
+            key=lambda item: item[1],
+            reverse=True
+        )
+        top_countries = ordered_countries[:top_n]
 
-    avg_by_country = {country: round(statistics.mean(ages), 1) for country, ages in country_ages.items() if ages}
+        # Fix: comprovar llista real obtinguda
+        if not top_countries:
+            print("⚠️ No data.")
+            return
 
-    ordered_countries = sorted(
-        avg_by_country.items(),
-        key=lambda item: item[1],
-        reverse=True
-    )
+        countries = [c for c, _ in top_countries]
+        values = [v for _, v in top_countries]
 
-    top_countries = ordered_countries[:top_n]
+        plt.figure(figsize=(10, 6))
+        bars = plt.bar(countries, values, color="steelblue")
 
-    data = self.avg_by_country(top_n=top_n)
-    if not data:
-        print("⚠️ No hi ha dades per països.")
-        return
+        plt.title(f"Age average (Top {top_n})")
+        plt.ylabel("Age average")
+        plt.xlabel("Country")
+        plt.xticks(rotation=45, ha="right")
 
-    countries = [d["country"] for d in data]
-    values = [d["avg_age"] for d in data]
+        for bar, val in zip(bars, values):
+            plt.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.3, f"{val}", ha="center", va="bottom")
 
-    plt.figure(figsize=(10, 6))
-    bars = plt.bar(countries, values, color="steelblue")
-
-    plt.title(f"Mitjana d’edat per país (Top {top_n})")
-    plt.ylabel("Edat mitjana")
-    plt.xlabel("País")
-    plt.xticks(rotation=45, ha="right")
-
-    for bar, val in zip(bars, values):
-        plt.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.3, f"{val}", ha="center", va="bottom")
-
-    plt.tight_layout()
-    path = os.path.join(self.output_dir, "avg_age_by_country.png")
-    plt.savefig(path)
-    plt.close()
-    print(f"✅ Gràfic guardat: {path}")
+        plt.tight_layout()
+        path = os.path.join(self.output_dir, "avg_age_by_country.png")
+        plt.savefig(path)
+        plt.close()
+        print(f"✅ Save at: {path}")
 
 
 
