@@ -1,4 +1,5 @@
 import sqlite3
+import json
 
 class Loader:
     def __init__(self, db_path="etl_results.db", reset=False):
@@ -19,7 +20,8 @@ class Loader:
         """Crea las tablas si no existen."""
         with sqlite3.connect(self.db_path) as conn:
             c = conn.cursor()
-            # Tabla de usuarios con todos los campos relevantes
+
+            # Tabla de usuarios (sin cambios)
             c.execute("""
                 CREATE TABLE IF NOT EXISTS users (
                     uuid TEXT PRIMARY KEY,
@@ -58,13 +60,31 @@ class Loader:
                     nat TEXT
                 )
             """)
-            # Tabla de estadísticas
+
+            # Tabla de estadísticas sin ID
             c.execute("""
                 CREATE TABLE IF NOT EXISTS statistics (
                     total_users INTEGER,
                     avg_registered_age REAL,
+                    median_registered_age REAL,
+                    stdev_registered_age REAL,
+                    min_registered_age REAL,
+                    max_registered_age REAL,
                     male_percentage REAL,
-                    female_percentage REAL
+                    female_percentage REAL,
+                    unique_countries INTEGER,
+                    avg_age REAL,
+                    stdev_age REAL,
+                    min_age REAL,
+                    max_age REAL,
+                    correlation_age_registered REAL,
+                    top_5_ancient TEXT,
+                    registration_timeline TEXT,
+                    registration_seasonality TEXT,
+                    most_common_names TEXT,
+                    user_retention TEXT,
+                    age_groups TEXT,
+                    latest_user TEXT
                 )
             """)
             conn.commit()
@@ -86,7 +106,7 @@ class Loader:
                     u.get("location", {}).get("city"),
                     u.get("location", {}).get("state"),
                     u.get("location", {}).get("country"),
-                    str(u.get("location", {}).get("postcode")),  # puede ser string o int
+                    str(u.get("location", {}).get("postcode")),
                     float(u.get("location", {}).get("coordinates", {}).get("latitude", 0)),
                     float(u.get("location", {}).get("coordinates", {}).get("longitude", 0)),
                     u.get("location", {}).get("timezone", {}).get("offset"),
@@ -124,24 +144,47 @@ class Loader:
                 records
             )
             conn.commit()
-            print(f"💾 {len(users)} usuarios guardados en la base de datos.")
+            print(f"{len(users)} usuarios guardados en la base de datos.")
 
     def save_statistics(self, stats):
-        """Guarda las estadísticas en la tabla 'statistics'."""
+        """Guarda las estadísticas completas en la tabla 'statistics'."""
         with sqlite3.connect(self.db_path) as conn:
             c = conn.cursor()
             c.execute("DELETE FROM statistics")
-            c.execute(
-                """
-                INSERT INTO statistics (total_users, avg_registered_age, male_percentage, female_percentage)
-                VALUES (?, ?, ?, ?)
-                """,
-                (
-                    stats["total_users"],
-                    stats["average_time_registered"],
-                    stats["gender_distribution"]["male"],
-                    stats["gender_distribution"]["female"]
+
+            # Insertar los datos (usamos json.dumps para estructuras complejas)
+            c.execute("""
+                INSERT INTO statistics (
+                    total_users, avg_registered_age, median_registered_age, stdev_registered_age,
+                    min_registered_age, max_registered_age, male_percentage, female_percentage,
+                    unique_countries, avg_age, stdev_age, min_age, max_age,
+                    correlation_age_registered, top_5_ancient, registration_timeline,
+                    registration_seasonality, most_common_names, user_retention,
+                    age_groups, latest_user
                 )
-            )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                stats.get("total_users"),
+                stats.get("years_registered_stats", {}).get("average"),
+                stats.get("years_registered_stats", {}).get("median"),
+                stats.get("years_registered_stats", {}).get("stdev"),
+                stats.get("years_registered_stats", {}).get("min"),
+                stats.get("years_registered_stats", {}).get("max"),
+                stats.get("gender_distribution", {}).get("male"),
+                stats.get("gender_distribution", {}).get("female"),
+                stats.get("unique_countries"),
+                stats.get("age_distribution", {}).get("average"),
+                stats.get("age_distribution", {}).get("stdev"),
+                stats.get("age_distribution", {}).get("min"),
+                stats.get("age_distribution", {}).get("max"),
+                stats.get("age_registered_correlation"),
+                json.dumps(stats.get("top_5_ancient")),
+                json.dumps(stats.get("registration_timeline")),
+                json.dumps(stats.get("registration_seasonality")),
+                json.dumps(stats.get("most_common_names")),
+                json.dumps(stats.get("user_retention_analysis")),
+                json.dumps(stats.get("age_groups_distribution")),
+                json.dumps(stats.get("latest_user"))
+            ))
             conn.commit()
-            print("💾 Estadísticas guardadas correctamente.")
+            print("Estadísticas guardadas correctamente.")

@@ -8,9 +8,6 @@ import os
 
 
 def main():
-    print("🚀 Iniciando ejecución principal...")
-
-    # Configurar rutas de salida basadas en BASE_DIR
     vis_path = os.path.join(BASE_DIR, "data", "output", "visualizations")
     db_path = os.path.join(BASE_DIR, "data", "database", "etl_results.db")
 
