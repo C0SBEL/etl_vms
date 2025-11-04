@@ -226,6 +226,27 @@ class Transformer:
         
         self.statistics["user_retention_analysis"] = retention
         return retention
+    
+    def most_common_names(self, top_n=10):
+        """Nombres y apellidos más comunes"""
+        first_names = [user["name"]["first"].title() for user in self.users 
+                    if "name" in user and "first" in user["name"]]
+        last_names = [user["name"]["last"].title() for user in self.users 
+                    if "name" in user and "last" in user["name"]]
+        
+        if not first_names or not last_names:
+            return None
+        
+        names_stats = {
+            "top_first_names": dict(Counter(first_names).most_common(top_n)),
+            "top_last_names": dict(Counter(last_names).most_common(top_n)),
+            "unique_first_names": len(set(first_names)),
+            "unique_last_names": len(set(last_names))
+        }
+        
+        self.statistics["most_common_names"] = names_stats
+        return names_stats
+
         
     def transform(self, users):
         self.users = users
@@ -239,6 +260,7 @@ class Transformer:
         self.registration_timeline()
         self.registration_seasonality()
         self.user_retention_analysis()
+        self.most_common_names()
 
         #Devuelve el diccionario de estadísticas
         return self.statistics

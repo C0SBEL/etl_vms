@@ -302,8 +302,64 @@ class Visualizer:
         path = os.path.join(self.output_dir, "user_retention_analysis.png")
         plt.savefig(path, dpi=300, bbox_inches='tight', facecolor='white')
         plt.close()
-    
 
+    def plot_most_common_names(self):
+        """Gráfico de barras horizontales dobles mostrando nombres y apellidos más comunes"""
+        names_data = self.stats.get("most_common_names")
+        if not names_data:
+            return
+        
+        first_names = names_data.get("top_first_names", {})
+        last_names = names_data.get("top_last_names", {})
+        
+        if not first_names or not last_names:
+            return
+        
+        # Crear figura con dos subplots
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 8))
+        fig.suptitle('Nombres y Apellidos Más Comunes', fontsize=18, fontweight='bold', y=0.98)
+        
+        # Subplot 1: Nombres más comunes
+        first_names_list = list(first_names.keys())
+        first_counts = list(first_names.values())
+        
+        bars1 = ax1.barh(first_names_list, first_counts, color='steelblue', edgecolor='black')
+        ax1.set_xlabel('Frecuencia', fontsize=12, fontweight='bold')
+        ax1.set_title(f'Top {len(first_names_list)} Nombres\n({names_data["unique_first_names"]} nombres únicos)', 
+                    fontsize=14, fontweight='bold', pad=10)
+        ax1.invert_yaxis()  # Para que el más común esté arriba
+        ax1.grid(True, alpha=0.3, axis='x')
+        
+        # Añadir valores en las barras
+        for bar, count in zip(bars1, first_counts):
+            width = bar.get_width()
+            ax1.text(width, bar.get_y() + bar.get_height()/2, 
+                    f' {count}', ha='left', va='center', fontweight='bold', fontsize=10)
+        
+        # Subplot 2: Apellidos más comunes
+        last_names_list = list(last_names.keys())
+        last_counts = list(last_names.values())
+        
+        bars2 = ax2.barh(last_names_list, last_counts, color='darksalmon', edgecolor='black')
+        ax2.set_xlabel('Frecuencia', fontsize=12, fontweight='bold')
+        ax2.set_title(f'Top {len(last_names_list)} Apellidos\n({names_data["unique_last_names"]} apellidos únicos)', 
+                    fontsize=14, fontweight='bold', pad=10)
+        ax2.invert_yaxis()
+        ax2.grid(True, alpha=0.3, axis='x')
+        
+        # Añadir valores en las barras
+        for bar, count in zip(bars2, last_counts):
+            width = bar.get_width()
+            ax2.text(width, bar.get_y() + bar.get_height()/2, 
+                    f' {count}', ha='left', va='center', fontweight='bold', fontsize=10)
+        
+        plt.tight_layout()
+        
+        # Guardar
+        path = os.path.join(self.output_dir, "most_common_names.png")
+        plt.savefig(path, dpi=300, bbox_inches='tight')
+        plt.close()
+ 
     def generate_visualizations(self, users, stats):
         if users:
             self.users = users
@@ -319,3 +375,4 @@ class Visualizer:
         self.plot_registration_timeline()
         self.plot_registration_seasonality()
         self.plot_user_retention_analysis() 
+        self.plot_most_common_names()
