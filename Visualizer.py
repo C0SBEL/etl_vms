@@ -1,8 +1,6 @@
 import os
 import matplotlib.pyplot as plt
 import geopandas as gpd
-import geoplot as gplt
-import geoplot.crs as gcrs
 
 class Visualizer:
     def __init__(self, output_dir="visualizations", clean=True):
@@ -82,18 +80,17 @@ class Visualizer:
         if not country_dist:
             print("No hay datos de países para generar el mapa.")
             return
+
         world = gpd.read_file("https://naturalearth.s3.amazonaws.com/110m_cultural/ne_110m_admin_0_countries.zip")
         world["percentage"] = world["NAME"].map(country_dist).fillna(0)
-        fig, ax = plt.subplots(subplot_kw={'projection': gcrs.Robinson()}, figsize=(15, 8))
 
-        gplt.choropleth(
-            world,
-            hue="percentage",
-            cmap="Blues",  # Escala de color
-            legend=True,
+        fig, ax = plt.subplots(figsize=(15, 8))
+        world.plot(
+            column="percentage",
+            cmap="Blues",
+            linewidth=0.5,
             edgecolor="black",
-            linewidth=0.4,
-            projection=gcrs.Robinson(),
+            legend=True,
             ax=ax
         )
 
@@ -121,6 +118,6 @@ class Visualizer:
         if country_dist:
             self.plot_country_choropleth(country_dist)
         else:
-            print("⚠️ No hay distribución de países en las estadísticas.")
+            print("No hay distribución de países en las estadísticas.")
 
 
