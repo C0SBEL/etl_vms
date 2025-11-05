@@ -9,7 +9,6 @@ class Loader:
             self._clear_tables()
 
     def _clear_tables(self):
-        """Vacía las tablas de la base de datos."""
         with sqlite3.connect(self.db_path) as conn:
             c = conn.cursor()
             c.execute("DELETE FROM users")
@@ -17,11 +16,9 @@ class Loader:
             conn.commit()
 
     def _create_tables(self):
-        """Crea las tablas si no existen."""
         with sqlite3.connect(self.db_path) as conn:
             c = conn.cursor()
 
-            # Tabla de usuarios (sin cambios)
             c.execute("""
                 CREATE TABLE IF NOT EXISTS users (
                     uuid TEXT PRIMARY KEY,
@@ -61,7 +58,6 @@ class Loader:
                 )
             """)
 
-            # Tabla de estadísticas sin ID
             c.execute("""
                 CREATE TABLE IF NOT EXISTS statistics (
                     total_users INTEGER,
@@ -90,7 +86,6 @@ class Loader:
             conn.commit()
 
     def save_users(self, users):
-        """Guarda los usuarios en la tabla 'users'."""
         with sqlite3.connect(self.db_path) as conn:
             c = conn.cursor()
             records = []
